@@ -66,9 +66,7 @@ public final class Main {
             // Controller can now step in and take over.
             Singletons.getControl().initialize();
             return;
-        }
-
-        // command line startup here
+        }        // command line startup here
         String mode = args[0].toLowerCase();
 
         switch (mode) {
@@ -79,17 +77,56 @@ public final class Main {
             case "parse":
                 CardReaderExperiments.parseAllCards(args);
                 break;
+                
+            case "convert":
+                convertDeck(args);
+                break;
 
             case "server":
                 System.out.println("Dedicated server mode.\nNot implemented.");
                 break;
 
             default:
-                System.out.println("Unknown mode.\nKnown mode is 'sim', 'parse' ");
+                System.out.println("Unknown mode.\nKnown modes are 'sim', 'parse', 'convert'");
                 break;
+        }        System.exit(0);
+    }
+    
+    /**
+     * Handle deck conversion command
+     */
+    private static void convertDeck(String[] args) {
+        if (args.length != 3) {
+            System.out.println("Usage: convert <input_file> <output_file>");
+            System.out.println("  input_file:  Path to the deck file to convert (relative or absolute)");
+            System.out.println("  output_file: Path for the output DCK file (relative or absolute)");
+            System.out.println();
+            System.out.println("Example: convert my_deck.txt my_deck.dck");
+            System.out.println("Example: convert \"C:\\Users\\Name\\Documents\\deck.dec\" \"C:\\Users\\Name\\Documents\\converted.dck\"");
+            return;
         }
-
-        System.exit(0);
+        
+        // Initialize Forge data model for deck conversion
+        try {
+            Singletons.initializeOnce(false);
+        } catch (Exception e) {
+            System.err.println("Failed to initialize Forge: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+        
+        String inputFile = args[1];
+        String outputFile = args[2];
+        
+        System.out.println("Forge Deck Converter");
+        System.out.println("Input:  " + inputFile);
+        System.out.println("Output: " + outputFile);
+        System.out.println();
+        
+        boolean success = DeckConverter.convertDeck(inputFile, outputFile);
+        if (!success) {
+            System.exit(1);
+        }
     }
 
     @SuppressWarnings("deprecation")
